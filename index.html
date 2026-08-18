@@ -9,8 +9,8 @@
             margin: 0;
             padding: 0;
             font-family: Arial, sans-serif;
-            background-color: #32CD32; /* Лаймовый фон по умолчанию */
-            background-image: url('820.png'); /* Твоя картинка фона */
+            background-color: #32CD32;
+            background-image: url('820.png');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -24,6 +24,7 @@
             font-size: 28px;
             margin-top: 20px;
             font-weight: bold;
+            text-shadow: 1px 1px 2px white;
         }
         #clock-frame {
             background-color: black;
@@ -59,12 +60,16 @@
             margin-top: 15px;
             border-radius: 5px;
             cursor: pointer;
+            box-shadow: 0 4px #990000;
         }
-        /* Стили для вкладок */
+        #stop-btn:active {
+            box-shadow: 0 2px #990000;
+            transform: translateY(2px);
+        }
         .tabs {
             display: flex;
             margin-top: 20px;
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.4);
             padding: 5px;
             border-radius: 5px;
         }
@@ -75,6 +80,7 @@
             font-size: 14px;
             cursor: pointer;
             color: black;
+            font-weight: bold;
         }
         .tab-btn.active {
             background-color: white;
@@ -82,16 +88,60 @@
             font-weight: bold;
         }
         .tab-content {
-            background-color: #f0f0f0;
+            background-color: rgba(240, 240, 240, 0.95);
             padding: 20px;
-            border-radius: 5px;
-            width: 80%;
-            max-width: 350px;
+            border-radius: 10px;
+            width: 85%;
+            max-width: 360px;
             margin-top: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
             display: none;
+            box-sizing: border-box;
         }
         .tab-content.active { display: block; }
+        
+        .days-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+        .day-checkbox {
+            display: none;
+        }
+        .day-label {
+            padding: 6px 8px;
+            background-color: white;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+            user-select: none;
+        }
+        .day-checkbox:checked + .day-label {
+            background-color: #32CD32;
+            border-color: black;
+            color: white;
+        }
+        input[type="number"] {
+            padding: 5px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            text-align: center;
+        }
+        .action-btn {
+            background-color: black;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
     </style>
 </head>
 <body>
@@ -106,31 +156,40 @@
 
     <button id="stop-btn" onclick="stopAlarm()">🚨 ВЫКЛ БУДИЛЬНИК 🚨</button>
 
-    <!-- Вкладки -->
     <div class="tabs">
         <button class="tab-btn active" onclick="switchTab('alarm')">Будильник</button>
         <button class="tab-btn" onclick="switchTab('almanac')">Альманах</button>
         <button class="tab-btn" onclick="switchTab('hero')">Герой</button>
     </div>
 
-    <!-- Контент вкладок -->
     <div id="alarm" class="tab-content active">
-        <h3>Установка времени</h3>
-        Часы: <input type="number" id="alarm-hour" value="07" style="width: 40px;">
-        Мин: <input type="number" id="alarm-min" value="00" style="width: 40px;">
-        <br><br>
-        <button onclick="setAlarm()">Поставить будильник</button>
+        <h3 style="margin-top:0;">Установка времени</h3>
+        <label>Часы: <input type="number" id="alarm-hour" value="07" min="0" max="23" style="width: 50px;"></label>
+        <label style="margin-left:10px;">Мин: <input type="number" id="alarm-min" value="00" min="0" max="59" style="width: 50px;"></label>
+        
+        <h4>Повтор по дням:</h4>
+        <div class="days-container">
+            <input type="checkbox" id="day-1" class="day-checkbox" value="1"><label for="day-1" class="day-label">Пн</label>
+            <input type="checkbox" id="day-2" class="day-checkbox" value="2"><label for="day-2" class="day-label">Вт</label>
+            <input type="checkbox" id="day-3" class="day-checkbox" value="3"><label for="day-3" class="day-label">Ср</label>
+            <input type="checkbox" id="day-4" class="day-checkbox" value="4"><label for="day-4" class="day-label">Чт</label>
+            <input type="checkbox" id="day-5" class="day-checkbox" value="5"><label for="day-5" class="day-label">Пт</label>
+            <input type="checkbox" id="day-6" class="day-checkbox" value="6"><label for="day-6" class="day-label">Сб</label>
+            <input type="checkbox" id="day-0" class="day-checkbox" value="0"><label for="day-0" class="day-label">Вс</label>
+        </div>
+        
+        <button class="action-btn" onclick="setAlarm()">Поставить будильник</button>
     </div>
 
     <div id="almanac" class="tab-content">
-        <h3>Альманах Героев</h3>
-        <p id="almanac-text">ГЕРОЙ: Дима<br><br>Тяжелая артиллерия. Запускает по навесной траектории бутылки...</p>
-        <button onclick="speakAlmanac()">🔊 Озвучить описание</button>
+        <h3 style="margin-top:0;">Альманах Героев</h3>
+        <p id="almanac-text"><b>ГЕРОЙ: Дима</b><br><br>Тяжелая артиллерия. Запускает по навесной траектории бутылки, которые наносят огромный урон по площади.</p>
+        <button class="action-btn" onclick="speakAlmanac()">🔊 Озвучить описание</button>
     </div>
 
     <div id="hero" class="tab-content">
-        <h3>Выбор активного героя</h3>
-        <button onclick="nextCharacter()" style="background: black; color: white; padding: 10px; font-size: 16px;">Следующий герой</button>
+        <h3 style="margin-top:0;">Выбор активного героя</h3>
+        <button class="action-btn" onclick="nextCharacter()">Следующий герой</button>
     </div>
 
     <script>
@@ -145,24 +204,29 @@
         let currentIdx = 0;
         let alarmTime = null;
         let alarmActive = false;
-        let alarmInterval;
+        let selectedDays = [];
 
-        // Обновление часов
         setInterval(() => {
             const now = new Date();
-            const timeString = now.toTimeString().split(' ')[0];
-            document.getElementById('clock').innerText = timeString;
+            const h = String(now.getHours()).padStart(2, '0');
+            const m = String(now.getMinutes()).padStart(2, '0');
+            const s = String(now.getSeconds()).padStart(2, '0');
+            const currentTimeString = `${h}:${m}:${s}`;
+            
+            document.getElementById('clock').innerText = currentTimeString;
 
-            // Проверка будильника
-            if (alarmTime && timeString.startsWith(alarmTime) && !alarmActive) {
-                alarmActive = true;
-                triggerAlarm();
+            if (alarmTime && currentTimeString === (alarmTime + ":00") && !alarmActive) {
+                const currentDay = now.getDay();
+                if (selectedDays.length === 0 || selectedDays.includes(currentDay)) {
+                    alarmActive = true;
+                    triggerAlarm();
+                }
             }
         }, 1000);
 
         function nextCharacter() {
             if (alarmActive) return;
-            currentIdx = (current_idx = currentIdx + 1) % characters.length;
+            currentIdx = (currentIdx + 1) % characters.length;
             const name = characters[currentIdx];
             document.getElementById('mode').innerText = "Режим: " + name;
             document.getElementById('almanac-text').innerHTML = `<b>ГЕРОЙ: ${name}</b><br><br>${descriptions[name]}`;
@@ -173,55 +237,55 @@
             const h = document.getElementById('alarm-hour').value.padStart(2, '0');
             const m = document.getElementById('alarm-min').value.padStart(2, '0');
             alarmTime = `${h}:${m}`;
+            
+            selectedDays = [];
+            document.querySelectorAll('.day-checkbox:checked').forEach(chk => {
+                selectedDays.push(parseInt(chk.value));
+            });
+
             speak("Будильник поставлен");
             document.getElementById('clock-frame').style.borderColor = "blue";
             setTimeout(() => document.getElementById('clock-frame').style.borderColor = "white", 500);
         }
 
         function triggerAlarm() {
-            alarmInterval = setInterval(() => {
-                const frame = document.getElementById('clock-frame');
-                frame.style.backgroundColor = frame.style.backgroundColor === 'red' ? 'black' : 'red';
-                speak("Зомби идут! Просыпайся!");
-            }, 1000);
+            if (!alarmActive) return;
+            const frame = document.getElementById('clock-frame');
+            frame.style.backgroundColor = frame.style.backgroundColor === 'red' ? 'black' : 'red';
+            speak("Зомби идут! Просыпайся!");
+            setTimeout(triggerAlarm, 1500);
         }
 
         function stopAlarm() {
             if (alarmActive) {
                 alarmActive = false;
-                clearInterval(alarmInterval);
+                window.speechSynthesis.cancel(); 
                 const frame = document.getElementById('clock-frame');
                 frame.style.backgroundColor = 'black';
                 frame.style.borderColor = 'white';
-                speak("Угроза устранена");
-            }
-        }
+setTimeout(() => {
+  speak("Угроза устранена");
+}, 300);
+}
+}
 
-        function speakAlmanac() {
-            const name = characters[currentIdx];
-            speak(`Герой ${name}. ${descriptions[name]}`);
-        }
+function speakAlmanac() {
+  if (alarmActive) return;
+  const name = characters[currentIdx];
+  speak(`Герой ${name}. ${descriptions[name]}`);
+}
 
-        // Встроенная озвучка Web Speech API (работает в любом браузере смартфона!)
-        function speak(text) {
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'ru-RU';
-            window.speechSynthesis.speak(utterance);
-        }
+function speak(text) {
+  window.speechSynthesis.cancel();
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = 'ru-RU';
+  window.speechSynthesis.speak(utterance);
+}
 
-        // Переключение вкладок
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-            event.target.classList.add('active');
-        }
-        speak("Зомби идут! Просыпайся!");
-        setTimeout(triggerAlarm, 1500);
-        }
-        function stopAlarm() {
-            if (alarmActive) {
-                alarmActive = false;window.speechSynthesis.cancel();const frame = document.getElementById('clock-frame');frame.style.backgroundColor = 'black';frame.style.borderColor = 'white';setTimeout(() => {speak("Угроза устранена");}, 300);}}function speakAlmanac() {if (alarmActive) return;const name = characters[currentIdx];speak(Герой ${name}. ${descriptions[name]});}function speak(text) {window.speechSynthesis.cancel();const utterance = new SpeechSynthesisUtterance(text);utterance.lang = 'ru-RU';window.speechSynthesis.speak(utterance);}function switchTab(tabId) {document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));document.getElementById(tabId).classList.add('active');event.target.classList.add('active');}
-    </script>
-</body>
-</html>
+function switchTab(tabId) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById(tabId).classList.add('active');
+  event.target.classList.add('active');
+}
+        

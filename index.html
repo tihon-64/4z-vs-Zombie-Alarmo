@@ -18,6 +18,7 @@
             flex-direction: column;
             align-items: center;
             height: 100vh;
+            overflow: hidden;
         }
         h1 {
             color: black;
@@ -25,6 +26,8 @@
             margin-top: 20px;
             font-weight: bold;
             text-shadow: 1px 1px 2px white;
+            position: relative;
+            z-index: 10;
         }
         #clock-frame {
             background-color: black;
@@ -34,6 +37,8 @@
             margin-top: 10px;
             text-align: center;
             transition: all 0.2s;
+            position: relative;
+            z-index: 10;
         }
         #clock {
             color: #32CD32;
@@ -49,6 +54,8 @@
             font-size: 16px;
             font-weight: bold;
             border-radius: 5px;
+            position: relative;
+            z-index: 10;
         }
         #stop-btn {
             background-color: red;
@@ -61,6 +68,8 @@
             border-radius: 5px;
             cursor: pointer;
             box-shadow: 0 4px #990000;
+            position: relative;
+            z-index: 10;
         }
         #stop-btn:active {
             box-shadow: 0 2px #990000;
@@ -69,9 +78,11 @@
         .tabs {
             display: flex;
             margin-top: 20px;
-            background: rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.6);
             padding: 5px;
             border-radius: 5px;
+            position: relative;
+            z-index: 10;
         }
         .tab-btn {
             background: none;
@@ -97,6 +108,8 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.2);
             display: none;
             box-sizing: border-box;
+            position: relative;
+            z-index: 10;
         }
         .tab-content.active { display: block; }
         
@@ -157,9 +170,9 @@
     <button id="stop-btn" onclick="stopAlarm()">🚨 ВЫКЛ БУДИЛЬНИК 🚨</button>
 
     <div class="tabs">
-        <button class="tab-btn active" onclick="switchTab('alarm')">Будильник</button>
-        <button class="tab-btn" onclick="switchTab('almanac')">Альманах</button>
-        <button class="tab-btn" onclick="switchTab('hero')">Герой</button>
+        <button id="btn-alarm" class="tab-btn active" onclick="switchTab('alarm')">Будильник</button>
+        <button id="btn-almanac" class="tab-btn" onclick="switchTab('almanac')">Альманах</button>
+        <button id="btn-hero" class="tab-btn" onclick="switchTab('hero')">Герой</button>
     </div>
 
     <div id="alarm" class="tab-content active">
@@ -205,8 +218,10 @@
         let alarmTime = null;
         let alarmActive = false;
         let selectedDays = [];
+        let alarmInterval = null;
 
-        setInterval(() => {
+        // Корректный вывод времени
+        function updateClock() {
             const now = new Date();
             const h = String(now.getHours()).padStart(2, '0');
             const m = String(now.getMinutes()).padStart(2, '0');
@@ -222,7 +237,9 @@
                     triggerAlarm();
                 }
             }
-        }, 1000);
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
 
         function nextCharacter() {
             if (alarmActive) return;
@@ -250,23 +267,29 @@
 
         function triggerAlarm() {
             if (!alarmActive) return;
-            const frame = document.getElementById('clock-frame');
-            frame.style.backgroundColor = frame.style.backgroundColor === 'red' ? 'black' : 'red';
-            speak("Зомби идут! Просыпайся!");
-            setTimeout(triggerAlarm, 1500);
-        }
-
-        function stopAlarm() {
-            if (alarmActive) {
-                alarmActive = false;
-                window.speechSynthesis.cancel(); 
-                const frame = document.getElementById('clock-frame');
-                frame.style.backgroundColor = 'black';
-                frame.style.borderColor = 'white';
-setTimeout(() => {
-  speak("Угроза устранена");
-}, 300);
+        if(!alarmInterval) {
+  alarmInterval = setInterval(() => {
+    const frame = document.getElementById('clock-frame');
+    frame.style.backgroundColor = frame.style.backgroundColor === 'red' ? 'black' : 'red';
+    speak("Зомби идут! Просыпайся!");
+  }, 1500);
 }
+
+function stopAlarm() {
+  if (alarmActive) {
+    alarmActive = false;
+    clearInterval(alarmInterval);
+    alarmInterval = null;
+    window.speechSynthesis.cancel();
+
+    const frame = document.getElementById('clock-frame');
+    frame.style.backgroundColor = 'black';
+    frame.style.borderColor = 'white';
+
+    setTimeout(() => {
+      speak("Угроза устранена");
+    }, 300);
+  }
 }
 
 function speakAlmanac() {
@@ -286,6 +309,10 @@ function switchTab(tabId) {
   document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
   document.getElementById(tabId).classList.add('active');
-  event.target.classList.add('active');
+
+  if(tabId === 'alarm') document.getElementById('btn-alarm').classList.add('active');
+  if(tabId === 'almanac') document.getElementById('btn-almanac').classList.add('active');
+  if(tabId === 'hero') document.getElementById('btn-hero').classList.add('active');
 }
-        
+</body>
+</html>       

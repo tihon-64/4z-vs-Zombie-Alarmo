@@ -216,6 +216,12 @@
             document.getElementById(tabId).classList.add('active');
             event.target.classList.add('active');
         }
+        speak("Зомби идут! Просыпайся!");
+        setTimeout(triggerAlarm, 1500);
+        }
+        function stopAlarm() {
+            if (alarmActive) {
+                alarmActive = false;window.speechSynthesis.cancel();const frame = document.getElementById('clock-frame');frame.style.backgroundColor = 'black';frame.style.borderColor = 'white';setTimeout(() => {speak("Угроза устранена");}, 300);}}function speakAlmanac() {if (alarmActive) return;const name = characters[currentIdx];speak(Герой ${name}. ${descriptions[name]});}function speak(text) {window.speechSynthesis.cancel();const utterance = new SpeechSynthesisUtterance(text);utterance.lang = 'ru-RU';window.speechSynthesis.speak(utterance);}function switchTab(tabId) {document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));document.getElementById(tabId).classList.add('active');event.target.classList.add('active');}
     </script>
 </body>
 </html>
